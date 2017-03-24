@@ -1,19 +1,22 @@
-package camt.cbsd.services;
+package camt.cbsd.dao;
 
 import camt.cbsd.entity.Student;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * Created by CAMT on 3/24/2017.
+ */
 @Profile("firstDataSource")
 @ConfigurationProperties(prefix = "server")
-@Service
-public class StudentServiceImpl implements StudentService {
+@Repository
+public class StudentDaoImpl implements StudentDao {
+    List<Student> students;
     String imageBaseUrl;
     String baseUrl;
     String imageUrl;
@@ -27,13 +30,9 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @PostConstruct
-    protected void setImageBaseUrl() {
+    private void init() {
         imageBaseUrl = baseUrl + imageUrl;
-    }
-
-    @Override
-    public List<Student> getStudents() {
-        List<Student> students = new ArrayList<>();
+        students = new ArrayList<>();
 
         Student student = new Student(1, "SE-001", "Mitsuha", "Miyamizu",
                 2.15, imageBaseUrl + "mitsuha.gif", true, 0,
@@ -47,6 +46,15 @@ public class StudentServiceImpl implements StudentService {
                 2.15, imageBaseUrl + "Kloop.gif", true, 2,
                 "The man for the Kop");
         students.add(student);
+    }
+
+    @Override
+    public List<Student> getStudents() {
         return students;
+    }
+
+    @Override
+    public Student findById(long id) {
+        return students.stream().filter(s -> s.getId() == id).findFirst().get();
     }
 }
